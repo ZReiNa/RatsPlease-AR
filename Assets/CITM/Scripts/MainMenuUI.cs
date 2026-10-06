@@ -1,81 +1,113 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.XR.ARFoundation;
 
 public class MainMenuUI : MonoBehaviour
 {
     [Header("UI")]
-    [SerializeField] private CanvasGroup menuRoot;     // whole menu (background included)
+    [SerializeField] private CanvasGroup menuRoot;
     [SerializeField] private CanvasGroup titleGroup;
     [SerializeField] private CanvasGroup buttonGroup;
     [SerializeField] private Button startButton;
 
-    [Header("AR")]
-    [SerializeField] private ARSession arSession;      // component is disabled in the editor
-
     [Header("Timing")]
-    [SerializeField] private float initialDelay = 0.5f;
-    [SerializeField] private float fadeInDuration = 1.0f;
-    [SerializeField] private float fadeOutDuration = 1.0f;
+    [SerializeField] private float titleFadeDelay = 0.5f;
+    [SerializeField] private float fadeDuration = 0.75f;
+
+    private Coroutine menuRoutine;
 
     private void Awake()
     {
+        
         menuRoot.alpha = 1f;
         menuRoot.gameObject.SetActive(true);
 
         titleGroup.alpha = 0f;
         buttonGroup.alpha = 0f;
+
+        startButton.interactable = true;
         buttonGroup.interactable = false;
         buttonGroup.blocksRaycasts = false;
-
-        if (arSession != null)
-            arSession.enabled = false;
-
-        startButton.onClick.AddListener(OnStartPressed);
     }
 
-    private IEnumerator Start()
+    private void Start()
     {
-        yield return new WaitForSecondsRealtime(initialDelay);
+        startButton.onClick.AddListener(OnStartPressed);
+        ShowMenu();
+    }
 
-        yield return Fade(titleGroup, 0f, 1f, fadeInDuration);
-        yield return Fade(buttonGroup, 0f, 1f, fadeInDuration);
-
-        buttonGroup.interactable = true;
-        buttonGroup.blocksRaycasts = true;
+    private void OnDestroy()
+    {
+        startButton.onClick.RemoveListener(OnStartPressed);
     }
 
     private void OnStartPressed()
     {
         startButton.interactable = false;
-        StartCoroutine(StartSequence());
+        GameManager.Instance.StartGame();
+        FadeOutMenu();
     }
 
-    private IEnumerator StartSequence()
+    public void ShowMenu()
     {
-        // Start the AR camera while the menu fades out
-        if (arSession != null)
-            arSession.enabled = true;
+        if (menuRoutine != null)
+            StopCoroutine(menuRoutine);
 
-        menuRoot.blocksRaycasts = false;
-        yield return Fade(menuRoot, 1f, 0f, fadeOutDuration);
+        menuRoot.gameObject.SetActive(true);
+        menuRoot.alpha = 1f;
+        menuRoot.blocksRaycasts = true;
 
-        menuRoot.gameObject.SetActive(false);
+        titleGroup.alpha = 0f;
+        buttonGroup.alpha = 0f;
+        buttonGroup.interactable = false;
+        buttonGroup.blocksRaycasts = false;
+        startButton.interactable = true;
 
-        if (GameManager.Instance != null)
-            GameManager.Instance.StartGame();
+        menuRoutine = StartCoroutine(FadeMenuIn());
     }
 
-    private IEnumerator Fade(CanvasGroup group, float from, float to, float duration)
+    public void FadeOutMenu()
     {
-        float t = 0f;
-        while (t < duration)
+        if (menuRoutine != null)
+            StopCoroutine(menuRoutine);
+
+        menuRoutine = StartCoroutine(FadeMenuOut());
+    }
+
+    private IEnumerator FadeMenuIn()
+    {
+        yield return new WaitForSecondsRealtime(titleFadeDelay);
+
+        yield return FadeCanvasGroup(titleGroup, 0f, 1f, fadeDuration);
+        yield return FadeCanvasGroup(buttonGroup, 0f, 1f, fadeDuration);
+
+        buttonGroup.interactable = true;
+        buttonGroup.blocksRaycasts = true;
+    }
+
+    private IEnumerator FadeMenuOut()
+{
+    buttonGroup.interactable = false;
+    buttonGroup.blocksRaycasts = false;
+    menuRoot.blocksRaycasts = false;
+
+    
+    yield return FadeCanvasGroup(menuRoot, menuRoot.alpha, 0f, fadeDuration);
+
+    menuRoot.gameObject.SetActive(false);
+}
+
+    private IEnumerator FadeCanvasGroup(CanvasGroup group, float from, float to, float duration)
+    {
+        float elapsed = 0f;
+
+        while (elapsed < duration)
         {
-            t += Time.unscaledDeltaTime;
-            group.alpha = Mathf.Lerp(from, to, t / duration);
+            elapsed += Time.unscaledDeltaTime;
+            group.alpha = Mathf.Lerp(from, to, elapsed / duration);
             yield return null;
         }
+
         group.alpha = to;
     }
 }

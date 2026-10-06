@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
 
     public bool GameStarted { get; private set; }
 
-    // Resets when the app process is closed and reopened
+    // Resets when the app fully closes and reopens
     private static bool tutorialHasPlayedThisAppSession = false;
 
     public event Action OnGameStarted;
@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
     }
 
@@ -46,7 +47,6 @@ public class GameManager : MonoBehaviour
         OnGameStarted?.Invoke();
     }
 
-    // Stops the game (timer, spawning, HUD) without touching the menu
     public void EndGame()
     {
         if (!GameStarted) return;
@@ -57,6 +57,7 @@ public class GameManager : MonoBehaviour
     public void ReturnToMenu()
     {
         EndGame();
+
         if (mainMenuUI != null)
             mainMenuUI.ShowMenu();
     }

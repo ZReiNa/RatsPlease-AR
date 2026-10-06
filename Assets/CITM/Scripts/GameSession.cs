@@ -6,8 +6,8 @@ using UnityEngine.UI;
 [Serializable]
 public class RuleCard
 {
-    public Sprite sprite;               
-    public int[] cheeseGuestIndices;    
+    public Sprite sprite;
+    public int[] cheeseGuestIndices;
 }
 
 public class GameSession : MonoBehaviour
@@ -102,27 +102,32 @@ public class GameSession : MonoBehaviour
             Finish();
             return;
         }
+
         UpdateTimerText();
     }
 
     private void Finish()
     {
-        GameManager.Instance.EndGame();   
+        GameManager.Instance.EndGame();
 
         finalScoreText.text = $"Score: {score}";
         resultsPanel.SetActive(true);
     }
 
-    public void Evaluate(int guestIndex, CardType card)
+    public bool Evaluate(int guestIndex, CardType card)
     {
-        if (!running) return;
+        if (!running) return false;
 
         bool guestWantsCheese = Array.IndexOf(currentRule.cheeseGuestIndices, guestIndex) >= 0;
         bool correct = (card == CardType.Cheese) == guestWantsCheese;
 
-        score += correct ? pointsForCorrect : -penaltyForWrong;
-        score = Mathf.Max(0, score);
+        if (correct)
+            score += pointsForCorrect;
+        else
+            score = Mathf.Max(0, score - penaltyForWrong);
+
         UpdateScoreText();
+        return correct;
     }
 
     private void OnExitPressed()

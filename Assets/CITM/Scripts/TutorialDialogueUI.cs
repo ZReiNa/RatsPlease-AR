@@ -16,7 +16,7 @@ public class TutorialDialogueUI : MonoBehaviour
     {
         "Hello, my lackey! Today you have an important job to do.",
         "My royal party is about to start, and I have invited many of my 'friends.'",
-        "Your mission is to serve delicious cheese to those who are dressed up accordingly.",
+        "Your mission is to serve delicious cheese to those who are dressed up for the occasion.",
         "And for those who aren't, give 'em the trap.",
         "Just move the pertinent card towards the guest.",
         "You have 3 minutes to do your job; I expect great results from you."

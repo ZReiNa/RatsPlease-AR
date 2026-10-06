@@ -21,19 +21,9 @@ MonoBehaviour:
       m_GuidLow: 5263836647374264650
       m_GuidHigh: 3371487819063738769
     m_SerializedTextureGuid:
-      m_GuidLow: 1856744762102721055
-      m_GuidHigh: 10427726769398618923
+      m_GuidLow: 12831916363594208365
+      m_GuidHigh: 10739500151371028616
     m_Size: {x: 0, y: 0}
     m_SpecifySize: 0
-    m_Name: Cheese
-    m_Texture: {fileID: 0}
-  - m_SerializedGuid:
-      m_GuidLow: 5082791031680495744
-      m_GuidHigh: 1041348293565737143
-    m_SerializedTextureGuid:
-      m_GuidLow: 2978219036968998171
-      m_GuidHigh: 5071533986243543625
-    m_Size: {x: 0, y: 0}
-    m_SpecifySize: 0
-    m_Name: Mousetrap
+    m_Name: GuestMarker
     m_Texture: {fileID: 0}

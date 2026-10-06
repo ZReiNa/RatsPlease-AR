@@ -18,7 +18,6 @@ public class MainMenuUI : MonoBehaviour
 
     private void Awake()
     {
-        
         menuRoot.alpha = 1f;
         menuRoot.gameObject.SetActive(true);
 
@@ -86,16 +85,15 @@ public class MainMenuUI : MonoBehaviour
     }
 
     private IEnumerator FadeMenuOut()
-{
-    buttonGroup.interactable = false;
-    buttonGroup.blocksRaycasts = false;
-    menuRoot.blocksRaycasts = false;
+    {
+        buttonGroup.interactable = false;
+        buttonGroup.blocksRaycasts = false;
+        menuRoot.blocksRaycasts = false;
 
-    
-    yield return FadeCanvasGroup(menuRoot, menuRoot.alpha, 0f, fadeDuration);
+        yield return FadeCanvasGroup(menuRoot, menuRoot.alpha, 0f, fadeDuration);
 
-    menuRoot.gameObject.SetActive(false);
-}
+        menuRoot.gameObject.SetActive(false);
+    }
 
     private IEnumerator FadeCanvasGroup(CanvasGroup group, float from, float to, float duration)
     {

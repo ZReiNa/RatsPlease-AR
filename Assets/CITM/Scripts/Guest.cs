@@ -22,6 +22,6 @@ public class Guest : MonoBehaviour
         if (card == null) return;
 
         resolved = true;
-        spawner.OnGuestHit(this, card.Type);
+        spawner.OnGuestHit(this, card);
     }
 }

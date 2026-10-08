@@ -89,39 +89,58 @@ public class GuestSpawner : MonoBehaviour
     }
 
     private void SpawnGuest()
+{
+    int index = Random.Range(0, guestPrefabs.Length);
+
+    var go = Instantiate(guestPrefabs[index], marker.transform);
+    go.transform.localPosition = Vector3.zero;
+    go.transform.localRotation = Quaternion.identity;
+
+    foreach (var col in go.GetComponentsInChildren<Collider>(true))
     {
-        int index = Random.Range(0, guestPrefabs.Length);
+        col.enabled = true;
+        col.isTrigger = true;
 
-        var go = Instantiate(guestPrefabs[index], marker.transform);
-        go.transform.localPosition = Vector3.zero;
-        go.transform.localRotation = Quaternion.identity;
-
-        var guest = go.GetComponent<Guest>();
-        if (guest == null)
-            guest = go.AddComponent<Guest>();
-
-        guest.Init(index, this);
-        currentGuest = guest;
+        if (col is MeshCollider mc)
+            mc.convex = true;
     }
 
-    public void OnGuestHit(Guest guest, CardType card)
+    var rb = go.GetComponent<Rigidbody>();
+    if (rb == null)
+        rb = go.AddComponent<Rigidbody>();
+    rb.isKinematic = true;
+    rb.useGravity = false;
+
+    var guest = go.GetComponent<Guest>();
+    if (guest == null)
+        guest = go.AddComponent<Guest>();
+
+    guest.Init(index, this);
+    currentGuest = guest;
+}
+
+public void OnGuestHit(Guest guest, CardItem card)
+{
+    if (guest != currentGuest) return;
+
+    bool correct = GameSession.Instance.Evaluate(guest.Index, card.Type);
+
+    var fx = correct ? heartEffectPrefab : skullEffectPrefab;
+    if (fx != null)
     {
-        if (guest != currentGuest) return;
-
-        bool correct = GameSession.Instance.Evaluate(guest.Index, card);
-
-        var fx = correct ? heartEffectPrefab : skullEffectPrefab;
-        if (fx != null)
-        {
-            var pos = guest.transform.position + guest.transform.up * effectHeight;
-            Destroy(Instantiate(fx, pos, Quaternion.identity), 3f);
-        }
-
-        Destroy(guest.gameObject);
-        currentGuest = null;
-        cooldown = respawnDelay;
-
-        if (CardController.Instance != null)
-            CardController.Instance.ClearCard();
+        var pos = guest.transform.position + guest.transform.up * effectHeight;
+        Destroy(Instantiate(fx, pos, Quaternion.identity), 3f);
     }
+
+    
+    Destroy(guest.gameObject);
+    currentGuest = null;
+    cooldown = respawnDelay;
+
+    if (CardController.Instance != null)
+        CardController.Instance.ClearCard(); 
+
+    if (card != null)
+        Destroy(card.gameObject); 
+}
 }
